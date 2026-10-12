@@ -775,11 +775,11 @@
       <p class="gate-q" data-i18n="gate.q">請選擇你的身分</p>
       <div class="gate-options">
         <button class="gate-card" data-role="staff">
-          <span><span class="gc-title" data-i18n="gate.card.staff.title">泳隊成員及幹部</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.staff.desc">需要驗證碼，查看隊務與管理內容</span></span>
+          <span><span class="gc-title" data-i18n="gate.card.staff.title">校隊成員及幹部</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.staff.desc">需要驗證碼，查看隊務與管理內容</span></span>
           <span class="gc-arrow">→</span>
         </button>
         <button class="gate-card" data-role="member">
-          <span><span class="gc-title" data-i18n="gate.card.member.title">社員</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.member.desc">查看一般社員可瀏覽的完整內容</span></span>
+          <span><span class="gc-title" data-i18n="gate.card.member.title">社團成員</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.member.desc">查看一般社員可瀏覽的完整內容</span></span>
           <span class="gc-arrow">→</span>
         </button>
         <button class="gate-card" data-role="freshman">
@@ -883,14 +883,14 @@
             <p style="font-size:13.5px;color:var(--ink-soft);margin:0;">如果未來想往運動教練、運動專員教練的方向發展，可以優先考量「運動教練學分學程」。學程裡有些課可能兩年才開一次，錯過就要再等，建議及早規劃；這些課同時可以認定為通識領域學分。詳細必修科目請以下方學分學程官方頁面的最新資訊為主。</p>
           </div>
           <div class="card">
-            <p class="eyebrow">管理學院系網（企業管理學系）</p>
-            <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">企業管理學系課程資訊查詢頁面，可查詢課程資訊、加退選時間等。</p>
-            <a class="btn ghost" href="https://bba.ncnu.edu.tw/p/404-1043-17760.php?Lang=zh-tw" target="_blank" rel="noopener">前往管理學院系網</a>
+            <p class="eyebrow">管理學院學士班系網</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">管理學院學士班課程資訊查詢頁面，可查詢課程資訊、加退選時間等。</p>
+            <a class="btn ghost" href="https://bba.ncnu.edu.tw/p/404-1043-17760.php?Lang=zh-tw" target="_blank" rel="noopener">前往管理學院學士班系網</a>
             <p class="note" style="margin-top:12px;">課程地圖多半由工讀生製作，內容可能與實際有出入。查詢課程時請一律以「必修科目一覽表」為準。</p>
           </div>
           <div class="card">
             <p class="eyebrow">觀光餐旅學院系網</p>
-            <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">觀光餐旅相關學系的系網入口，非管理學院／企業管理學系，請依自己的系所查看對應連結。</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">觀光餐旅相關學系的系網入口，非管理學院學士班，請依自己的系所查看對應連結。</p>
             <a class="btn ghost" href="https://www.tourism.ncnu.edu.tw" target="_blank" rel="noopener">前往觀光餐旅學院系網</a>
           </div>
           <div class="card">
@@ -992,7 +992,7 @@
       <section class="page" id="page-partners">
         <p class="eyebrow">05 / PARTNERS</p>
         <h2 class="pagetitle" data-i18n="page.partners.title">合作商家</h2>
-        <p class="lede" data-i18n="page.partners.lede">合作商家資訊，僅開放泳隊成員及幹部查看。</p>
+        <p class="lede" data-i18n="page.partners.lede">合作商家資訊與訂購方式，所有身分都可以查看。</p>
 
         <div class="card" style="text-align:center;padding:36px 20px;">
           <p style="font-weight:700;font-size:16px;margin:0 0 14px;">Bukubuku 合作商家</p>
@@ -1059,8 +1059,8 @@
   // ---------- identity gate ----------
   const STAFF_CODE = '2201';
   const roleAccess = {
-    freshman: ['home','freshman','instagram'],
-    member:   ['home','instagram'],
+    freshman: ['home','freshman','partners','instagram'],
+    member:   ['home','partners','instagram'],
     staff:    ['home','freshman','org','equipment','finance','partners','instagram'],
     test:     ['home','freshman','org','equipment','finance','partners','instagram']
   };
@@ -1081,13 +1081,13 @@
     'role.note.label':          {zh:'目前身分', en:'Current Role'},
     'role.switch':              {zh:'重新選擇身分', en:'Switch Identity'},
     'role.freshman':            {zh:'泳隊新生', en:'New Member'},
-    'role.member':              {zh:'社員', en:'Club Member'},
-    'role.staff':                {zh:'泳隊成員及幹部', en:'Team & Officers'},
+    'role.member':              {zh:'社團成員', en:'Club Member'},
+    'role.staff':                {zh:'校隊成員及幹部', en:'Team & Officers'},
     'role.test':                 {zh:'測試中', en:'Testing'},
     'gate.q':                   {zh:'請選擇你的身分', en:'Please select your role'},
-    'gate.card.staff.title':     {zh:'泳隊成員及幹部', en:'Team & Officers'},
+    'gate.card.staff.title':     {zh:'校隊成員及幹部', en:'Team & Officers'},
     'gate.card.staff.desc':      {zh:'需要驗證碼，查看隊務與管理內容', en:'Requires a passcode — view team & admin content'},
-    'gate.card.member.title':    {zh:'社員', en:'Club Member'},
+    'gate.card.member.title':    {zh:'社團成員', en:'Club Member'},
     'gate.card.member.desc':     {zh:'查看一般社員可瀏覽的完整內容', en:'View the full content available to members'},
     'gate.card.freshman.title':  {zh:'泳隊新生', en:'New Member'},
     'gate.card.freshman.desc':   {zh:'查看新生專區與基本隊務資訊', en:'View onboarding info for new members'},
@@ -1122,7 +1122,7 @@
     'page.finance.title':        {zh:'資金收支明細', en:'Finance'},
     'page.finance.lede':         {zh:'社團經費收支的完整明細，由社長維護，僅開放幹部查看。', en:'The full income & expense ledger, maintained by the president, staff-only.'},
     'page.partners.title':       {zh:'合作商家', en:'Partners'},
-    'page.partners.lede':        {zh:'合作商家資訊，僅開放泳隊成員及幹部查看。', en:'Partner shop info, visible to team members & officers only.'},
+    'page.partners.lede':        {zh:'合作商家資訊與訂購方式，所有身分都可以查看。', en:'Partner shop info and ordering instructions, open to everyone.'},
     'page.instagram.title':      {zh:'Instagram', en:'Instagram'},
     'page.instagram.lede':       {zh:'活動宣傳與對外溝通的主要管道，詳細動態請至 Instagram 查看。', en:'The main channel for event promotion — see Instagram for the latest.'},
     'cal.title':                 {zh:'賽事行事曆', en:'Competition Calendar'},
