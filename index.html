@@ -1,567 +1,1328 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>暨大游泳隊｜隊務資訊系統</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        swim: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FullCalendar CDN -->
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css' rel='stylesheet' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>暨大游泳隊｜隊務資訊系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121A24;
+    --ink-soft:#3C4854;
+    --bg:#F1F5F9;
+    --surface:#FFFFFF;
+    --teal:#1D5BA6;
+    --teal-deep:#0E2A4D;
+    --teal-tint:#E6EEF9;
+    --lane:#E2572B;
+    --lane-tint:#FCE8DF;
+    --stone:#7E8B96;
+    --line:#DCE4EA;
+    --good:#2F7A56;
+    --good-tint:#E5F2EB;
+    --amber:#B4780F;
+    --amber-tint:#FBEFDC;
+    --bad:#B23B2E;
+    --bad-tint:#F8E4E0;
+    --radius:10px;
+    --sidebar-w:236px;
+    --font-body:'Noto Sans TC', system-ui, sans-serif;
+    --font-data:'Space Grotesk', 'Noto Sans TC', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;}
+  ::selection{background:var(--lane-tint);color:var(--lane);}
+
+  /* ---------- layout shell ---------- */
+  .shell{display:flex;min-height:100vh;}
+
+  .sidebar{
+    width:var(--sidebar-w);
+    flex-shrink:0;
+    background:var(--teal-deep);
+    color:#EAF1FB;
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    top:0;left:0;bottom:0;
+    z-index:40;
+    transition:transform .25s ease;
+  }
+  .brand{
+    padding:26px 22px 18px;
+    border-bottom:1px solid rgba(234,243,241,.14);
+  }
+  .brand .mark{
+    font-family:var(--font-data);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:.02em;
+    color:#8EC6F2;
+    display:block;
+    margin-bottom:6px;
+  }
+  .brand h1{
+    font-size:18px;
+    margin:0;
+    font-weight:700;
+    line-height:1.4;
+  }
+  .brand p{
+    margin:6px 0 0;
+    font-size:12.5px;
+    color:#AFC6E0;
+  }
+
+  nav.mainnav{flex:1;padding:14px 10px;overflow-y:auto;}
+  nav.mainnav .navitem{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    text-align:left;
+    padding:10px 12px;
+    border-radius:8px;
+    border:none;
+    background:transparent;
+    color:#CFE0F5;
+    font-size:14.5px;
+    cursor:pointer;
+    position:relative;
+    margin-bottom:2px;
+  }
+  nav.mainnav .navitem .idx{
+    font-family:var(--font-data);
+    font-size:11.5px;
+    color:#5F8FC9;
+    width:18px;
+    flex-shrink:0;
+  }
+  nav.mainnav .navitem:hover{background:rgba(255,255,255,.06);color:#fff;}
+  nav.mainnav .navitem.active{
+    background:rgba(255,255,255,.1);
+    color:#fff;
+    font-weight:700;
+  }
+  nav.mainnav .navitem.active::before{
+    content:"";
+    position:absolute;
+    left:-10px;top:8px;bottom:8px;
+    width:4px;
+    background:var(--lane);
+    border-radius:2px;
+  }
+  .sidebar-foot{
+    padding:16px 22px 20px;
+    border-top:1px solid rgba(234,243,241,.14);
+    font-size:11.5px;
+    color:#7F9BC2;
+  }
+
+  .content{
+    margin-left:var(--sidebar-w);
+    flex:1;
+    min-width:0;
+  }
+
+  .topbar{
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 18px;
+    background:var(--teal-deep);
+    color:#fff;
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .topbar .tbrand{font-weight:700;font-size:15px;}
+  .hbtn{
+    width:38px;height:38px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .hbtn span, .hbtn span::before, .hbtn span::after{
+    content:"";
+    display:block;
+    width:16px;height:2px;background:#fff;
+    position:relative;
+  }
+  .hbtn span::before{position:absolute;top:-5px;}
+  .hbtn span::after{position:absolute;top:5px;}
+
+  .overlay{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(10,20,18,.45);
+    z-index:35;
+  }
+
+  main{
+    padding:34px 40px 80px;
+    max-width:980px;
+  }
+
+  section.page{display:none;}
+  section.page.active{display:block;animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{
+    font-family:var(--font-data);
+    font-size:12px;
+    color:var(--teal);
+    font-weight:600;
+    margin:0 0 8px;
+  }
+  h2.pagetitle{
+    font-size:26px;
+    margin:0 0 6px;
+    font-weight:900;
+    color:var(--ink);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    max-width:560px;
+    margin:0 0 28px;
+  }
+
+  /* ---------- reusable components ---------- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+  }
+  .grid{display:grid;gap:14px;}
+  .grid-2{grid-template-columns:1fr 1fr;}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:760px){
+    .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+  }
+
+  .placeholder{
+    border:1.5px dashed #B9C9D9;
+    background:#FAFCFE;
+    border-radius:var(--radius);
+    padding:16px 18px;
+    color:var(--stone);
+    font-size:13.5px;
+  }
+  .placeholder .tag{
+    display:inline-block;
+    font-family:var(--font-data);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.02em;
+    color:var(--lane);
+    background:var(--lane-tint);
+    padding:2px 8px;
+    border-radius:20px;
+    margin-bottom:8px;
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 18px;
+    border-radius:8px;
+    background:var(--teal);
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    text-decoration:none;
+    border:none;
+    cursor:pointer;
+  }
+  .btn:hover{background:var(--teal-deep);}
+  .btn.ghost{
+    background:transparent;
+    color:var(--teal);
+    border:1.5px solid var(--teal);
+  }
+  .btn.ghost:hover{background:var(--teal-tint);}
+  .btn[disabled], a.btn.disabled{
+    background:#E2E9F2;color:#8C9FB3;cursor:not-allowed;pointer-events:none;
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{
+    text-align:left;
+    font-family:var(--font-data);
+    font-weight:600;
+    font-size:11.5px;
+    color:var(--stone);
+    padding:10px 12px;
+    border-bottom:1.5px solid var(--line);
+  }
+  td{
+    padding:12px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tr:last-child td{border-bottom:none;}
+  .num{font-family:var(--font-data);}
+
+  .status-pill{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:700;
+    padding:3px 10px;
+    border-radius:20px;
+  }
+  .status-ok{background:var(--good-tint);color:var(--good);}
+  .status-wait{background:var(--amber-tint);color:var(--amber);}
+  .status-none{background:#EEF2F1;color:var(--stone);}
+
+  .home-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:22px;
+  }
+  @media(max-width:900px){.home-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.home-grid{grid-template-columns:1fr;}}
+  .home-tile{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    cursor:pointer;
+    text-align:left;
+    display:flex;flex-direction:column;gap:10px;
+    min-height:118px;
+  }
+  .home-tile:hover{border-color:var(--teal);}
+  .home-tile .hi{font-family:var(--font-data);font-size:11px;color:var(--stone);}
+  .home-tile .ht{font-size:15.5px;font-weight:700;}
+  .home-tile .hd{font-size:12.5px;color:var(--stone);}
+
+  .hero{
+    background:var(--teal-deep);
+    color:#EAF1FB;
+    border-radius:14px;
+    padding:22px 26px 26px;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    min-width:0;
+  }
+  .hero .heyebrow{font-family:var(--font-data);font-size:12px;color:#8EC6F2;margin:0;}
+  .hero h1{font-size:26px;margin:0 0 12px;font-weight:900;}
+  .hero p{color:#CFE0F5;font-size:14px;margin:0;}
+
+  .lanebar{height:3px;background:repeating-linear-gradient(90deg,var(--lane) 0 26px, transparent 26px 34px);margin:26px 0;border-radius:2px;opacity:.7;}
+
+  .kv-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .kv-row:last-child{border-bottom:none;}
+  .kv-row .k{color:var(--stone);}
+
+  .org-role{
+    display:flex;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .org-role:last-child{border-bottom:none;}
+  .org-role .role-name{
+    width:110px;flex-shrink:0;font-weight:700;font-size:14px;padding-top:2px;
+  }
+  .org-role .role-desc{font-size:13.5px;color:var(--ink-soft);}
+
+  .filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .chip{
+    padding:7px 14px;
+    border-radius:20px;
+    border:1.5px solid var(--line);
+    background:#fff;
+    font-size:13px;
+    cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .chip.active{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700;}
+
+  .member-card{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    background:#fff;
+  }
+  .member-card .mtag{font-size:10.5px;font-family:var(--font-data);color:var(--teal);font-weight:700;}
+
+  footer.pagefoot{
+    margin-top:40px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-size:12px;
+    color:var(--stone);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .section-label{
+    font-family:var(--font-data);
+    font-size:11px;
+    font-weight:600;
+    color:var(--stone);
+    margin:26px 0 10px;
+  }
+  .section-label:first-of-type{margin-top:0;}
+
+  .note{
+    font-size:12.5px;
+    color:var(--stone);
+    margin-top:10px;
+  }
+
+  /* ---------- responsive ---------- */
+  @media(max-width:900px){
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .content{margin-left:0;}
+    .topbar{display:flex;}
+    .overlay.show{display:block;}
+    main{padding:24px 18px 70px;}
+    .hero{padding:26px 20px;}
+    .hero h1{font-size:22px;}
+  }
+
+  /* ---------- identity gate ---------- */
+  .gate{
+    position:fixed;inset:0;
+    background:var(--teal-deep);
+    z-index:200;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    overflow-y:auto;
+  }
+  .gate.hidden{display:none;}
+  .gate-inner{width:100%;max-width:420px;}
+  .gate-mark{
+    font-family:var(--font-data);
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:.02em;
+    color:#8EC6F2;
+    display:block;
+    margin-bottom:8px;
+    text-align:center;
+  }
+  .gate-brand{
+    font-size:20px;
+    font-weight:900;
+    color:#fff;
+    text-align:center;
+    margin-bottom:34px;
+  }
+  .gate-step{display:none;}
+  .gate-step.active{display:block;}
+  .gate-q{
+    color:#fff;
+    font-size:17px;
+    font-weight:700;
+    text-align:center;
+    margin:0 0 22px;
+  }
+  .gate-sub{
+    color:#CFE0F5;
+    font-size:13px;
+    text-align:center;
+    margin:-14px 0 20px;
+  }
+  .gate-options{display:flex;flex-direction:column;gap:12px;}
+  .gate-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#fff;
+    border:1px solid transparent;
+    border-radius:var(--radius);
+    padding:18px 20px;
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+  }
+  .gate-card:hover{border-color:var(--lane);}
+  .gate-card .gc-title{font-size:15.5px;font-weight:700;color:var(--ink);}
+  .gate-card .gc-desc{font-size:12.5px;color:var(--stone);margin-top:3px;}
+  .gate-card .gc-arrow{
+    font-family:var(--font-data);
+    color:var(--teal);
+    font-size:18px;
+    flex-shrink:0;
+  }
+  .gate-input{
+    width:100%;
+    padding:13px 14px;
+    border-radius:8px;
+    border:1.5px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    font-size:15px;
+    font-family:var(--font-data);
+    letter-spacing:.08em;
+    text-align:center;
+    margin-bottom:12px;
+  }
+  .gate-input::placeholder{color:#AFC6E0;letter-spacing:normal;font-family:var(--font-body);}
+  .gate-input:focus{outline:none;border-color:var(--lane);}
+  .gate-error{
+    color:#FFCFC2;
+    background:rgba(226,87,43,.18);
+    border:1px solid rgba(226,87,43,.4);
+    border-radius:8px;
+    padding:9px 12px;
+    font-size:13px;
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .gate-btnrow{display:flex;gap:10px;}
+  .gate-btnrow .btn{flex:1;justify-content:center;}
+  .gate-btnrow .btn.ghost{color:#fff;border-color:rgba(255,255,255,.4);}
+  .gate-btnrow .btn.ghost:hover{background:rgba(255,255,255,.1);}
+
+  .role-note{
+    padding:14px 22px 18px;
+    border-top:1px solid rgba(234,243,241,.14);
+  }
+  .role-note .rn-label{font-size:11px;color:#7F9BC2;font-family:var(--font-data);}
+  .role-note .rn-value{font-size:13.5px;color:#fff;font-weight:700;margin:3px 0 8px;}
+  .role-note .rn-switch{
+    background:none;border:none;color:#8EC6F2;font-size:12px;
+    text-decoration:underline;cursor:pointer;padding:0;
+  }
+
+  /* ---------- preference toggles (language / brightness) ---------- */
+  .sidebar-tools{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:14px 22px;
+    border-top:1px solid rgba(234,243,241,.14);
+  }
+  .tool-group{display:flex;gap:6px;}
+  .pref-btn{
+    flex:1;
+    padding:7px 8px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,.2);
+    background:transparent;
+    color:#AFC6E0;
+    font-size:12px;
+    font-family:var(--font-data);
+    cursor:pointer;
+  }
+  .pref-btn:hover{color:#fff;border-color:rgba(255,255,255,.4);}
+  .pref-btn.active{background:rgba(255,255,255,.14);color:#fff;border-color:var(--lane);}
+
+  /* ---------- dark theme ---------- */
+  body.theme-dark{
+    --ink:#EAF1F8;
+    --ink-soft:#B9C9D9;
+    --bg:#0E1826;
+    --surface:#16222F;
+    --teal:#5B9FE8;
+    --teal-tint:#16283F;
+    --lane:#FF7A4D;
+    --lane-tint:#3A2620;
+    --stone:#8C9FB3;
+    --line:#283446;
+    --good:#5FCB92;
+    --good-tint:#153327;
+    --amber:#E0A23A;
+    --amber-tint:#3A2E12;
+    --bad:#E2685A;
+    --bad-tint:#3A2018;
+  }
+  /* ---------- race list (僅保留賽事清單，不再顯示月曆方格) ---------- */
+  /* 縮小的卡片，只放近期賽事清單，寬度不撐滿整個 Hero，維持短小方正。 */
+  .hb-label{
+    font-family:var(--font-data);
+    font-size:10px;
+    font-weight:600;
+    color:#8EC6F2;
+    margin:0 0 6px;
+  }
+  .hero-races{
+    min-width:0;
+    max-width:360px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:10px;
+    padding:10px 12px;
+    box-sizing:border-box;
+  }
+  @media(max-width:640px){
+    .hero-races{max-width:none;}
+  }
+
+  .cal-list{display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .cal-list-item{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding:6px 9px;
+    border:1px solid var(--line);
+    border-left-width:3px;
+    border-radius:8px;
+    background:var(--surface);
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+  .cal-list-item.cal-evt-blue{border-left-color:var(--teal);}
+  .cal-list-item.cal-evt-orange{border-left-color:var(--lane);}
+  .cal-list-item:hover{border-color:var(--lane);}
+  .cal-list-item .li-date{
+    font-family:var(--font-data);
+    font-size:10.5px;
+    font-weight:700;
+    color:var(--lane);
+  }
+  .cal-list-item .li-body{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .cal-list-item .li-body .li-name{font-weight:700;font-size:12px;color:var(--ink);overflow-wrap:break-word;}
+  .cal-list-item .li-body .li-loc{font-size:10.5px;color:var(--stone);overflow-wrap:break-word;}
+  .cal-list-item .li-body .li-deadline{font-size:10px;color:var(--amber);margin-top:1px;}
+  .cal-list-item .li-body .li-org{font-size:10px;color:var(--stone);margin-top:1px;}
+  .cal-list-item.active{border-color:var(--lane);}
+
+  /* ---------- race list skin inside the dark hero ---------- */
+  .hero .eyebrow, .hero .hb-label{color:#8EC6F2;}
+  .hero .cal-list-item{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);}
+  .hero .cal-list-item.cal-evt-blue{border-left-color:#8EC6F2;}
+  .hero .cal-list-item.cal-evt-orange{border-left-color:#FFB28A;}
+  .hero .cal-list-item:hover{border-color:var(--lane);}
+  .hero .cal-list-item.active{background:rgba(255,255,255,.14);border-color:var(--lane);}
+  .hero .cal-list-item .li-date{color:#FF8F63;}
+  .hero .cal-list-item .li-body .li-name{color:#fff;}
+  .hero .cal-list-item .li-body .li-loc{color:#CFE0F5;}
+  .hero .cal-list-item .li-body .li-deadline{color:#FFD08A;}
+  .hero .cal-list-item .li-body .li-org{color:#AFC6E0;}
+
+  body.theme-dark .placeholder{background:#16222F;border-color:#283446;}
+  body.theme-dark .gate-card{background:#16283F;}
+  body.theme-dark .gate-card .gc-title{color:#fff;}
+  body.theme-dark .btn.disabled, body.theme-dark a.btn.disabled{background:#22304A;color:#7F9BC2;}
+
+  /* ---------- 科技感視覺層 (tech skin) ---------- */
+  :root{ --grid-line:rgba(29,91,166,.07); --glow-blue:rgba(29,91,166,.35); --glow-orange:rgba(226,87,43,.40); }
+  body.theme-dark{ --grid-line:rgba(91,159,232,.08); --glow-blue:rgba(91,159,232,.35); --glow-orange:rgba(255,122,77,.40); }
+
+  body{
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:32px 32px;
+    background-attachment:fixed;
+  }
+
+  /* 側邊欄：深色漸層 + 細網格 + 發光指示條 */
+  .sidebar{
+    background:
+      linear-gradient(rgba(142,198,242,.05) 1px, transparent 1px) 0 0/100% 28px,
+      linear-gradient(180deg, #0E2A4D 0%, #0A1D38 100%);
+    border-right:1px solid rgba(142,198,242,.18);
+  }
+  nav.mainnav .navitem{letter-spacing:.02em;transition:background .2s, color .2s;}
+  nav.mainnav .navitem.active{box-shadow:inset 0 0 0 1px rgba(142,198,242,.28), 0 0 18px rgba(29,91,166,.45);}
+  nav.mainnav .navitem.active::before{box-shadow:0 0 10px var(--lane), 0 0 18px var(--glow-orange);}
+  .sidebar-foot::before{
+    content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:#3DDC97;box-shadow:0 0 8px #3DDC97;margin-right:8px;vertical-align:middle;
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  /* Hero：網格 + 光暈 + 掃描線 */
+  .hero{
+    background:
+      radial-gradient(520px 260px at 92% -10%, var(--glow-orange), transparent 70%),
+      radial-gradient(640px 320px at -5% 110%, var(--glow-blue), transparent 70%),
+      linear-gradient(135deg, #0E2A4D 0%, #0A1D38 100%);
+    border:1px solid rgba(142,198,242,.22);
+    box-shadow:0 0 0 1px rgba(255,255,255,.03) inset, 0 18px 50px -20px rgba(14,42,77,.7);
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(rgba(142,198,242,.07) 1px, transparent 1px) 0 0/28px 28px,
+      linear-gradient(90deg, rgba(142,198,242,.07) 1px, transparent 1px) 0 0/28px 28px;
+    -webkit-mask-image:linear-gradient(180deg, #000 0%, transparent 85%);
+            mask-image:linear-gradient(180deg, #000 0%, transparent 85%);
+  }
+  .hero::after{
+    content:"";position:absolute;left:0;right:0;height:2px;top:0;pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(142,198,242,.9), transparent);
+    box-shadow:0 0 14px rgba(142,198,242,.7);
+    animation:scan 6s linear infinite;
+  }
+  @keyframes scan{0%{top:0;opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{top:100%;opacity:0;}}
+  .hero > *{position:relative;z-index:1;}
+  .hero .heyebrow{letter-spacing:.14em;text-transform:uppercase;text-shadow:0 0 12px rgba(142,198,242,.6);}
+  .hero-races{border-color:rgba(142,198,242,.28);background:rgba(10,29,56,.55);backdrop-filter:blur(6px);}
+  .hero .cal-list-item{transition:box-shadow .2s, border-color .2s, transform .2s;}
+  .hero .cal-list-item:hover{box-shadow:0 0 16px var(--glow-orange);transform:translateY(-1px);}
+  .hero .cal-list-item.cal-evt-blue:hover{box-shadow:0 0 16px var(--glow-blue);}
+
+  /* 標題與標籤：等寬字、字距、發光底線 */
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;}
+  .eyebrow::before{content:"// ";color:var(--lane);}
+  h2.pagetitle{position:relative;padding-bottom:12px;}
+  h2.pagetitle::after{
+    content:"";position:absolute;left:0;bottom:0;width:64px;height:3px;border-radius:2px;
+    background:linear-gradient(90deg, var(--teal), var(--lane));
+    box-shadow:0 0 12px var(--glow-blue);
+  }
+  .section-label{letter-spacing:.14em;text-transform:uppercase;}
+
+  /* 卡片：細框 + 切角標記 + 懸浮發光 */
+  .card, .home-tile, .member-card{
+    position:relative;
+    border-color:rgba(29,91,166,.22);
+    box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 6px 22px -14px rgba(14,42,77,.45);
+    transition:box-shadow .25s, border-color .25s, transform .25s;
+  }
+  .card::before, .home-tile::before{
+    content:"";position:absolute;top:-1px;left:-1px;width:14px;height:14px;pointer-events:none;
+    border-top:2px solid var(--teal);border-left:2px solid var(--teal);border-top-left-radius:var(--radius);
+  }
+  .card::after, .home-tile::after{
+    content:"";position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;pointer-events:none;
+    border-bottom:2px solid var(--lane);border-right:2px solid var(--lane);border-bottom-right-radius:var(--radius);
+  }
+  .home-tile:hover{
+    transform:translateY(-3px);
+    box-shadow:0 0 0 1px var(--teal), 0 14px 34px -12px var(--glow-blue);
+  }
+  .home-tile .hi{letter-spacing:.12em;color:var(--teal);}
+
+  /* 按鈕：切角 + 發光 */
+  .btn{
+    border-radius:4px;
+    clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    letter-spacing:.04em;
+    transition:box-shadow .2s, background .2s, filter .2s;
+  }
+  .btn:hover{filter:drop-shadow(0 0 8px var(--glow-blue));}
+  .btn.ghost{border-radius:4px;}
+  .chip{transition:box-shadow .2s;}
+  .chip.active{box-shadow:0 0 14px var(--glow-blue);}
+
+  /* 身分選擇畫面 */
+  .gate{
+    background:
+      radial-gradient(600px 300px at 85% 0%, var(--glow-orange), transparent 70%),
+      radial-gradient(700px 360px at 0% 100%, var(--glow-blue), transparent 70%),
+      linear-gradient(135deg, #0E2A4D 0%, #0A1D38 100%);
+  }
+  .gate-brand{text-shadow:0 0 22px rgba(142,198,242,.55);letter-spacing:.04em;}
+  .gate-card{border:1px solid rgba(142,198,242,.25);transition:box-shadow .2s, border-color .2s, transform .2s;}
+  .gate-card:hover{box-shadow:0 0 22px var(--glow-orange);transform:translateY(-2px);}
+
+  .lanebar{box-shadow:0 0 12px var(--glow-orange);}
+
+  @media (prefers-reduced-motion: reduce){
+    .hero::after,.sidebar-foot::before{animation:none;}
+    .home-tile,.card,.btn,.hero .cal-list-item,.gate-card{transition:none;}
+  }
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col">
+<body>
 
-    <!-- 頂部導覽列 -->
-    <header class="bg-swim-800 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-                <div class="w-10 h-10 rounded-full bg-white text-swim-800 flex items-center justify-center font-bold text-lg shadow">
-                    <i class="fa-solid fa-water"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight tracking-wide">NCNU Swim Team</h1>
-                    <p class="text-xs text-swim-200">暨大游泳隊｜隊務資訊系統</p>
-                </div>
-            </div>
-            
-            <!-- 桌面版導覽 -->
-            <nav class="hidden md:flex items-center space-x-1">
-                <button onclick="switchTab('home')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium hover:bg-swim-700 transition active-tab" data-target="home">首頁</button>
-                <button onclick="switchTab('freshman')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium hover:bg-swim-700 transition" data-target="freshman">新生專區</button>
-                <button onclick="switchTab('rules')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium hover:bg-swim-700 transition" data-target="rules">組織與規範</button>
-                <button onclick="switchTab('equipment')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium hover:bg-swim-700 transition" data-target="equipment">器材管理</button>
-                <button onclick="switchTab('finance')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium hover:bg-swim-700 transition" data-target="finance">資金收支</button>
-                <button onclick="switchTab('partners')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium hover:bg-swim-700 transition" data-target="partners">合作商家</button>
-            </nav>
+<div class="gate" id="gate">
+  <div class="gate-inner">
+    <span class="gate-mark">NCNU · SWIM OPS</span>
+    <div class="gate-brand">NCNU Swim Team</div>
 
-            <!-- 右側工具列 (語系、暗色、身分) -->
-            <div class="flex items-center space-x-2">
-                <!-- 語系切換 -->
-                <button onclick="toggleLang()" id="langBtn" class="px-2.5 py-1.5 text-xs font-semibold rounded bg-swim-700 hover:bg-swim-600 transition">
-                    EN / 中
-                </button>
-                <!-- 暗色模式 -->
-                <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-swim-700 transition" title="切換外觀">
-                    <i id="darkModeIcon" class="fa-solid fa-moon"></i>
-                </button>
-                <!-- 手機版選單按鈕 -->
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-swim-700 transition">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- 手機版選單 -->
-        <div id="mobileMenu" class="hidden md:hidden bg-swim-900 border-t border-swim-700 px-4 pt-2 pb-4 space-y-1">
-            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium hover:bg-swim-700">首頁</button>
-            <button onclick="switchTab('freshman'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium hover:bg-swim-700">新生專區</button>
-            <button onclick="switchTab('rules'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium hover:bg-swim-700">組織與規範</button>
-            <button onclick="switchTab('equipment'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium hover:bg-swim-700">器材管理</button>
-            <button onclick="switchTab('finance'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium hover:bg-swim-700">資金收支</button>
-            <button onclick="switchTab('partners'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium hover:bg-swim-700">合作商家</button>
-        </div>
-    </header>
-
-    <!-- 身分驗證橫幅與狀態列 -->
-    <div class="bg-swim-50 dark:bg-slate-800 border-b border-swim-100 dark:border-slate-700 py-2 px-4 text-xs">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center space-x-2">
-                <span class="font-semibold text-swim-800 dark:text-swim-300"><i class="fa-solid fa-shield-halved mr-1"></i> 當前身分：</span>
-                <span id="currentRoleBadge" class="px-2 py-0.5 bg-swim-600 text-white rounded-full font-medium">測試中（權限全開）</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="openRoleModal()" class="text-swim-700 dark:text-swim-400 underline hover:text-swim-800 font-medium">切換身分 / 輸入幹部驗證碼</button>
-            </div>
-        </div>
+    <div class="sidebar-tools" style="border-top:none;padding:0 0 26px;">
+      <div class="tool-group">
+        <button class="pref-btn active" data-lang="zh">中文</button>
+        <button class="pref-btn" data-lang="en">EN</button>
+      </div>
+      <div class="tool-group">
+        <button class="pref-btn active" data-theme="light">☀ 亮</button>
+        <button class="pref-btn" data-theme="dark">☾ 暗</button>
+      </div>
     </div>
 
-    <!-- 主要內容區 -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="gate-step active" id="gate-select">
+      <p class="gate-q" data-i18n="gate.q">請選擇你的身分</p>
+      <div class="gate-options">
+        <button class="gate-card" data-role="staff">
+          <span><span class="gc-title" data-i18n="gate.card.staff.title">泳隊成員及幹部</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.staff.desc">需要驗證碼，查看隊務與管理內容</span></span>
+          <span class="gc-arrow">→</span>
+        </button>
+        <button class="gate-card" data-role="member">
+          <span><span class="gc-title" data-i18n="gate.card.member.title">社員</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.member.desc">查看一般社員可瀏覽的完整內容</span></span>
+          <span class="gc-arrow">→</span>
+        </button>
+        <button class="gate-card" data-role="freshman">
+          <span><span class="gc-title" data-i18n="gate.card.freshman.title">泳隊新生</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.freshman.desc">查看新生專區與基本隊務資訊</span></span>
+          <span class="gc-arrow">→</span>
+        </button>
+        <button class="gate-card" data-role="test">
+          <span><span class="gc-title" data-i18n="gate.card.test.title">測試中</span><span class="gc-desc" style="display:block;" data-i18n="gate.card.test.desc">開放檢視全部頁面，供測試使用</span></span>
+          <span class="gc-arrow">→</span>
+        </button>
+      </div>
+    </div>
 
-        <!-- ==================== 首頁 (Home) ==================== -->
-        <section id="tab-home" class="tab-content space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- 左側：事件 / Hero 內容 (佔 2 欄) -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Hero Banner -->
-                    <div class="bg-gradient-to-r from-swim-800 to-swim-600 text-white rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
-                        <div class="absolute right-0 bottom-0 opacity-10 translate-x-8 translate-y-8 text-9xl">
-                            <i class="fa-solid fa-person-swimming"></i>
-                        </div>
-                        <div class="relative z-10 space-y-4">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold uppercase tracking-wider">NCNU Swimming Team</span>
-                            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">暨大游泳隊｜隊務資訊系統</h2>
-                            <p class="text-swim-100 text-sm sm:text-base max-w-xl leading-relaxed">
-                                專為暨大游泳隊打造的數位化管理平台。整合隊務規範、器材清單、收支明細與賽事行事曆，提升團隊運作效率與傳承。
-                            </p>
-                            <div class="pt-2 flex flex-wrap gap-3">
-                                <button onclick="switchTab('freshman')" class="px-5 py-2.5 bg-white text-swim-800 hover:bg-swim-50 font-bold rounded-xl shadow transition text-sm">
-                                    新生專區 <i class="fa-solid fa-arrow-right ml-1"></i>
-                                </button>
-                                <button onclick="switchTab('equipment')" class="px-5 py-2.5 bg-swim-700 hover:bg-swim-600 text-white font-bold rounded-xl border border-swim-500 transition text-sm">
-                                    查看器材
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <div class="gate-step" id="gate-verify">
+      <p class="gate-q" data-i18n="gate.verify.q">幹部驗證</p>
+      <p class="gate-sub" data-i18n="gate.verify.sub">請輸入幹部驗證碼</p>
+      <input type="password" id="gate-code" class="gate-input" placeholder="驗證碼" inputmode="numeric" autocomplete="off">
+      <div class="gate-error" id="gate-error" data-i18n="gate.verify.error">驗證碼錯誤，請重新輸入</div>
+      <div class="gate-btnrow">
+        <button class="btn ghost" id="gate-back" data-i18n="gate.back">返回</button>
+        <button class="btn" id="gate-submit" data-i18n="gate.submit">確認</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-                    <!-- 快捷功能導航卡片 -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div onclick="switchTab('freshman')" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-swim-500 transition cursor-pointer text-center group">
-                            <div class="w-12 h-12 mx-auto rounded-full bg-swim-50 dark:bg-slate-700 text-swim-600 dark:text-swim-400 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">
-                                <i class="fa-solid fa-graduation-cap"></i>
-                            </div>
-                            <h3 class="font-bold text-sm">新生專區</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">選課與訓練須知</p>
-                        </div>
-                        <div onclick="switchTab('rules')" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-swim-500 transition cursor-pointer text-center group">
-                            <div class="w-12 h-12 mx-auto rounded-full bg-swim-50 dark:bg-slate-700 text-swim-600 dark:text-swim-400 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">
-                                <i class="fa-solid fa-book"></i>
-                            </div>
-                            <h3 class="font-bold text-sm">組織與規範</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">隊規與SOP</p>
-                        </div>
-                        <div onclick="switchTab('finance')" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-swim-500 transition cursor-pointer text-center group">
-                            <div class="w-12 h-12 mx-auto rounded-full bg-swim-50 dark:bg-slate-700 text-swim-600 dark:text-swim-400 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">
-                                <i class="fa-solid fa-wallet"></i>
-                            </div>
-                            <h3 class="font-bold text-sm">資金收支</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">公開透明明細</p>
-                        </div>
-                        <a href="https://instagram.com" target="_blank" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-pink-500 transition cursor-pointer text-center group">
-                            <div class="w-12 h-12 mx-auto rounded-full bg-pink-50 dark:bg-slate-700 text-pink-600 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition">
-                                <i class="fa-brands fa-instagram"></i>
-                            </div>
-                            <h3 class="font-bold text-sm">Instagram</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">追蹤最新動態</p>
-                        </a>
-                    </div>
+<div class="overlay" id="overlay"></div>
 
-                    <!-- 最新公告 / 隊務動態 -->
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-                        <h3 class="text-lg font-bold mb-4 flex items-center">
-                            <i class="fa-solid fa-bullhorn text-swim-600 mr-2"></i> 最新隊務公告
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border-l-4 border-swim-600">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-semibold px-2 py-0.5 bg-swim-100 text-swim-800 dark:bg-swim-900 dark:text-swim-200 rounded">重要賽事</span>
-                                    <span class="text-xs text-slate-400">2026-10-12</span>
-                                </div>
-                                <h4 class="font-bold text-sm">115年全國冬季短水道游泳錦標賽即將開始報名！</h4>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">報名日期為 2026/10/16 起至 2026/11/04 截止，請各位隊員留意時間並向隊長登記。</p>
-                            </div>
-                            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border-l-4 border-swim-600">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 rounded">系統上線</span>
-                                    <span class="text-xs text-slate-400">2026-09-01</span>
-                                </div>
-                                <h4 class="font-bold text-sm">暨大游泳隊｜隊務資訊系統正式啟用</h4>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">為了方便新進成員與期初交接，各項規定與器材租借流程已全面數位化。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand" id="brand-home" style="cursor:pointer;">
+      <span class="mark">NCNU · SWIM OPS</span>
+      <h1>NCNU Swim Team</h1>
+      <p data-i18n="sidebar.tagline">隊務資訊與管理系統</p>
+    </div>
+    <nav class="mainnav" id="mainnav">
+      <button class="navitem" data-target="home"><span class="idx">00</span><span data-i18n="nav.home">首頁</span></button>
+      <button class="navitem" data-target="freshman"><span class="idx">01</span><span data-i18n="nav.freshman">新生專區</span></button>
+      <button class="navitem" data-target="org"><span class="idx">02</span><span data-i18n="nav.org">組織與規範</span></button>
+      <button class="navitem" data-target="equipment"><span class="idx">03</span><span data-i18n="nav.equipment">器材管理</span></button>
+      <button class="navitem" data-target="finance"><span class="idx">04</span><span data-i18n="nav.finance">資金收支明細</span></button>
+      <button class="navitem" data-target="partners"><span class="idx">05</span><span data-i18n="nav.partners">合作商家</span></button>
+      <button class="navitem" data-target="instagram"><span class="idx">06</span><span data-i18n="nav.instagram">Instagram</span></button>
+    </nav>
+    <div class="sidebar-tools">
+      <div class="tool-group">
+        <button class="pref-btn active" data-lang="zh">中文</button>
+        <button class="pref-btn" data-lang="en">EN</button>
+      </div>
+      <div class="tool-group">
+        <button class="pref-btn active" data-theme="light">☀ 亮</button>
+        <button class="pref-btn" data-theme="dark">☾ 暗</button>
+      </div>
+    </div>
+    <div class="role-note">
+      <div class="rn-label" data-i18n="role.note.label">目前身分</div>
+      <div class="rn-value" id="role-badge">－</div>
+      <button class="rn-switch" id="role-switch" data-i18n="role.switch">重新選擇身分</button>
+    </div>
+    <div class="sidebar-foot">v0.3 · 身分分流版<br>資料由幹部團隊維護</div>
+  </aside>
 
-                <!-- 右側：小型賽事行事曆 (佔 1 欄，固定在右側方框內) -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 sticky top-20">
-                        <h3 class="text-base font-bold mb-3 flex items-center justify-between">
-                            <span><i class="fa-solid fa-calendar-days text-swim-600 mr-2"></i> 賽事行事曆</span>
-                            <span class="text-xs font-normal text-slate-400">公開資訊</span>
-                        </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">掌握近期重要游泳競賽與報名期限。</p>
-                        
-                        <!-- FullCalendar 容器 -->
-                        <div id="mini-calendar" class="text-xs bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700"></div>
-                        
-                        <!-- 賽事清單摘要 -->
-                        <div class="mt-4 space-y-2.5">
-                            <div class="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                                <div class="flex items-center justify-between">
-                                    <span class="font-bold text-xs text-blue-800 dark:text-blue-300">中華泳協排名賽</span>
-                                    <span class="text-[10px] bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded">11/14-11/15</span>
-                                </div>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>臺北市立大學詩欣館</p>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                                <div class="flex items-center justify-between">
-                                    <span class="font-bold text-xs text-purple-800 dark:text-purple-300">全國冬季短水道錦標賽</span>
-                                    <span class="text-[10px] bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded">11/19-11/23</span>
-                                </div>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>高雄市立國際游泳池</p>
-                                <p class="text-[10px] text-purple-600 dark:text-purple-400 mt-0.5 font-medium">報名：10/16 - 11/04</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="content">
+    <div class="topbar">
+      <div class="tbrand" id="tbrand-home" style="cursor:pointer;">NCNU Swim Team</div>
+      <button class="hbtn" id="hbtn"><span></span></button>
+    </div>
 
-            </div>
-        </section>
+    <main>
 
-        <!-- ==================== 新生專區 (Freshman) ==================== -->
-        <section id="tab-freshman" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
-                    <span class="text-xs font-semibold px-2.5 py-1 bg-swim-100 text-swim-800 dark:bg-swim-900 dark:text-swim-200 rounded-full">Newcomers</span>
-                    <h2 class="text-2xl font-bold mt-2">新生專區與選課方向建議</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">歡迎加入暨大游泳隊！這裡提供新生入隊須知與學业選課建議指南。</p>
-                </div>
+      <!-- 00 首頁 -->
+      <section class="page active" id="page-home">
+        <div class="hero">
+          <p class="heyebrow">NCNU SWIM TEAM / INFO SYSTEM</p>
 
-                <div class="space-y-6 text-sm leading-relaxed">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 space-y-3">
-                            <h3 class="font-bold text-base text-swim-700 dark:text-swim-400 flex items-center">
-                                <i class="fa-solid fa-person-swimming mr-2"></i> 入隊基本要求與裝備
-                            </h3>
-                            <ul class="list-disc list-inside space-y-2 text-slate-600 dark:text-slate-300 text-xs sm:text-sm">
-                                <li>具備基本的四式游动能力與安全水感。</li>
-                                <li>自備泳衣、泳褲、泳鏡、泳帽以及慣用訓練裝備（如蛙鞋、浮板等）。</li>
-                                <li>保持積極的出席態度，配合團隊訓練時間表。</li>
-                            </ul>
-                        </div>
+          <div class="hero-races">
+            <p class="hb-label" data-i18n="cal.upcoming">近期賽事</p>
+            <div class="cal-list" id="cal-list"></div>
+          </div>
+        </div>
 
-                        <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 space-y-3">
-                            <h3 class="font-bold text-base text-swim-700 dark:text-swim-400 flex items-center">
-                                <i class="fa-solid fa-graduation-cap mr-2"></i> 選課方向與職涯規劃
-                            </h3>
-                            <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2">
-                                <p>
-                                    如果未來有想往運動專任教練發展，建議優先考量運動教練學分學程中的課程。需要注意的是，學程中的部分課程並不會每年開課（可能兩年或三年開一次），請務必提前規劃；另外，這些課程的學分是可以同時認抵的。
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div class="home-grid">
+          <button class="home-tile" data-target="freshman"><span class="hi">01 · FOR NEW MEMBERS</span><span class="ht" data-i18n="tile.freshman.title">新生專區</span><span class="hd" data-i18n="tile.freshman.desc">選課方向、課程查詢、學分學程</span></button>
+          <button class="home-tile" data-target="org"><span class="hi">02 · GOVERNANCE</span><span class="ht" data-i18n="tile.org.title">組織與規範</span><span class="hd" data-i18n="tile.org.desc">幹部分工、隊規、交接資訊</span></button>
+          <button class="home-tile" data-target="equipment"><span class="hi">03 · EQUIPMENT</span><span class="ht" data-i18n="tile.equipment.title">器材管理</span><span class="hd" data-i18n="tile.equipment.desc">採購紀錄與使用狀態</span></button>
+          <button class="home-tile" data-target="finance"><span class="hi">04 · FINANCE</span><span class="ht" data-i18n="tile.finance.title">資金收支明細</span><span class="hd" data-i18n="tile.finance.desc">社團經費收支明細表</span></button>
+          <button class="home-tile" data-target="partners"><span class="hi">05 · PARTNERS</span><span class="ht" data-i18n="tile.partners.title">合作商家</span><span class="hd" data-i18n="tile.partners.desc">合作商家資訊與訂購方式</span></button>
+          <button class="home-tile" data-target="instagram"><span class="hi">06 · SOCIAL</span><span class="ht" data-i18n="tile.instagram.title">Instagram</span><span class="hd" data-i18n="tile.instagram.desc">追蹤活動與宣傳動態</span></button>
+        </div>
+      </section>
 
-        <!-- ==================== 組織與規範 (Rules) ==================== -->
-        <section id="tab-rules" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
-                    <span class="text-xs font-semibold px-2.5 py-1 bg-swim-100 text-swim-800 dark:bg-swim-900 dark:text-swim-200 rounded-full">Governance & SOP</span>
-                    <h2 class="text-2xl font-bold mt-2">組織與規範</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">暨大游泳隊組織章程、訓練規範與標準作業流程。</p>
-                </div>
+      <!-- 01 新生專區 -->
+      <section class="page" id="page-freshman">
+        <p class="eyebrow">01 / FOR NEW MEMBERS</p>
+        <h2 class="pagetitle" data-i18n="page.freshman.title">新生專區</h2>
+        <p class="lede" data-i18n="page.freshman.lede">給剛加入游泳隊的新生，快速了解學校與隊務相關的重要資訊。</p>
 
-                <div class="space-y-4">
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <h3 class="font-bold text-base mb-2 text-swim-700 dark:text-swim-400">第一條：訓練出席與請假規範</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">隊員應準時參與表定訓練。若有事無法出席，須於訓練開始前完成請假手續，無故未到者將記點警告。</p>
-                    </div>
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <h3 class="font-bold text-base mb-2 text-swim-700 dark:text-swim-400">第二條：幹部權責與交接</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">各幹部（隊長、經費、器材等）須如實記錄隊務資料，並於學年結束前完成數位化資料交接。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div class="grid grid-2">
+          <div class="card">
+            <p class="eyebrow">選課方向</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin:0;">如果未來想往運動教練、運動專員教練的方向發展，可以優先考量「運動教練學分學程」。學程裡有些課可能兩年才開一次，錯過就要再等，建議及早規劃；這些課同時可以認定為通識領域學分。詳細必修科目請以下方學分學程官方頁面的最新資訊為主。</p>
+          </div>
+          <div class="card">
+            <p class="eyebrow">管理學院系網（企業管理學系）</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">企業管理學系課程資訊查詢頁面，可查詢課程資訊、加退選時間等。</p>
+            <a class="btn ghost" href="https://bba.ncnu.edu.tw/p/404-1043-17760.php?Lang=zh-tw" target="_blank" rel="noopener">前往管理學院系網</a>
+            <p class="note" style="margin-top:12px;">課程地圖多半由工讀生製作，內容可能與實際有出入。查詢課程時請一律以「必修科目一覽表」為準。</p>
+          </div>
+          <div class="card">
+            <p class="eyebrow">觀光餐旅學院系網</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">觀光餐旅相關學系的系網入口，非管理學院／企業管理學系，請依自己的系所查看對應連結。</p>
+            <a class="btn ghost" href="https://www.tourism.ncnu.edu.tw" target="_blank" rel="noopener">前往觀光餐旅學院系網</a>
+          </div>
+          <div class="card">
+            <p class="eyebrow">運動相關學分學程</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">與運動、體育相關的學分學程簡介，詳細資訊請至學校官方網站查看。</p>
+            <a class="btn" href="https://curriculum.ncnu.edu.tw/p/412-1049-1486.php?Lang=zh-tw" target="_blank" rel="noopener">前往學校官方網頁</a>
+          </div>
+        </div>
 
-        <!-- ==================== 器材管理 (Equipment) ==================== -->
-        <section id="tab-equipment" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-6 flex flex-wrap justify-between items-center gap-4">
-                    <div>
-                        <span class="text-xs font-semibold px-2.5 py-1 bg-swim-100 text-swim-800 dark:bg-swim-900 dark:text-swim-200 rounded-full">Inventory</span>
-                        <h2 class="text-2xl font-bold mt-2">器材管理與借用清單</h2>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">管理公用訓練器材、數量與借用狀態。</p>
-                    </div>
-                    <!-- 幹部專屬新增按鈕 -->
-                    <button onclick="openAddEquipmentModal()" id="addEquipBtn" class="hidden px-4 py-2 bg-swim-600 hover:bg-swim-700 text-white text-xs font-bold rounded-xl shadow transition">
-                        <i class="fa-solid fa-plus mr-1"></i> 新增器材
-                    </button>
-                </div>
+        <p class="section-label">其他新生重要資訊</p>
+        <div class="placeholder"><span class="tag">待補資料</span>可加入：宿舍與泳池交通方式、入隊流程、必備裝備清單、聯絡窗口等。</div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm">
-                        <thead class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 uppercase font-semibold">
-                            <tr>
-                                <th class="p-3">器材名稱</th>
-                                <th class="p-3">總數量</th>
-                                <th class="p-3">可用狀況</th>
-                                <th class="p-3">存放位置</th>
-                                <th class="p-3">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="equipmentTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
-                            <tr>
-                                <td class="p-3 font-medium">短蛙鞋 (Arena)</td>
-                                <td class="p-3">20</td>
-                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 rounded text-xs font-medium">正常使用</span></td>
-                                <td class="p-3">泳隊儲藏室 A 架</td>
-                                <td class="p-3"><button class="text-swim-600 hover:underline font-medium">借用登記</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-3 font-medium">浮板 (Kickboard)</td>
-                                <td class="p-3">15</td>
-                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 rounded text-xs font-medium">正常使用</span></td>
-                                <td class="p-3">泳隊儲藏室 B 箱</td>
-                                <td class="p-3"><button class="text-swim-600 hover:underline font-medium">借用登記</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+        <footer class="pagefoot"><span>更新頻率：每學期</span><span>維護：文書 / 副社長</span></footer>
+      </section>
 
-        <!-- ==================== 資金收支 (Finance) ==================== -->
-        <section id="tab-finance" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-6 flex flex-wrap justify-between items-center gap-4">
-                    <div>
-                        <span class="text-xs font-semibold px-2.5 py-1 bg-swim-100 text-swim-800 dark:bg-swim-900 dark:text-swim-200 rounded-full">Transparency</span>
-                        <h2 class="text-2xl font-bold mt-2">資金收支明細</h2>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">公開透明之隊費收支與活動經費明細。</p>
-                    </div>
-                    <button onclick="openAddFinanceModal()" id="addFinanceBtn" class="hidden px-4 py-2 bg-swim-600 hover:bg-swim-700 text-white text-xs font-bold rounded-xl shadow transition">
-                        <i class="fa-solid fa-plus mr-1"></i> 新增帳目
-                    </button>
-                </div>
+      <!-- 02 組織與規範 -->
+      <section class="page" id="page-org">
+        <p class="eyebrow">02 / GOVERNANCE</p>
+        <h2 class="pagetitle" data-i18n="page.org.title">組織與規範</h2>
+        <p class="lede" data-i18n="page.org.lede">遇到事情應該找誰？組織是怎麼運作的？這個頁面用來回答這兩個問題。</p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs text-slate-500">當前結餘</p>
-                        <p class="text-2xl font-extrabold text-swim-600 mt-1">NT$ 15,420</p>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs text-slate-500">本學期總收入</p>
-                        <p class="text-2xl font-extrabold text-emerald-600 mt-1">NT$ 24,000</p>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs text-slate-500">本學期總支出</p>
-                        <p class="text-2xl font-extrabold text-rose-600 mt-1">NT$ 8,580</p>
-                    </div>
-                </div>
+        <p class="section-label">組織架構 / 幹部分工</p>
+        <div class="card">
+          <div class="org-role"><div class="role-name">社長（隊長）</div><div class="role-desc">主導訓練計劃；社團經費帳目管理；社團公用泳具之採購與詳細帳務紀錄。對應「器材管理」頁面。</div></div>
+          <div class="org-role"><div class="role-name">副社長（副隊長）</div><div class="role-desc">協助社長處理社務；負責社團對外形象（社群媒體管理與小編職務）與賽事後勤行政（如參賽之飯店住宿與交通規劃）。</div></div>
+          <div class="org-role"><div class="role-name">總務</div><div class="role-desc">負責各項發展計畫（如教育部新南向等）之申請作業。</div></div>
+          <div class="org-role"><div class="role-name">文書</div><div class="role-desc">負責社團基本資料維護（皆存放於雲端）、大會會議紀錄，以及社團評鑑等行政文書資料之彙整。</div></div>
+          <div class="org-role"><div class="role-name">社員</div><div class="role-desc">負責出席</div></div>
+        </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm">
-                        <thead class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 uppercase font-semibold">
-                            <tr>
-                                <th class="p-3">日期</th>
-                                <th class="p-3">項目說明</th>
-                                <th class="p-3">類別</th>
-                                <th class="p-3">金額 (NT$)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                            <tr>
-                                <td class="p-3 text-slate-500">2026-09-15</td>
-                                <td class="p-3 font-medium">115學年上學期隊費收繳</td>
-                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 rounded text-xs font-medium">收入</span></td>
-                                <td class="p-3 text-emerald-600 font-bold">+24,000</td>
-                            </tr>
-                            <tr>
-                                <td class="p-3 text-slate-500">2026-09-20</td>
-                                <td class="p-3 font-medium">購買訓練用浮板及耗材</td>
-                                <td class="p-3"><span class="px-2 py-0.5 bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200 rounded text-xs font-medium">支出</span></td>
-                                <td class="p-3 text-rose-600 font-bold">-8,580</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+        <p class="section-label">學期評分標準</p>
+        <div class="card">
+          <div style="margin-bottom:16px;">
+            <p style="font-weight:700;font-size:14px;margin:0 0 6px;">一、訓練次數與成績計算</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin:0;">每學期依照實際訓練安排調整。例如上學期每週訓練 4 天，扣除開學第一週、期中考及期末考後，整學期約 50 次訓練，原則上 1 次訓練算 1 分。下學期若增加晨操，訓練次數增加，則依實際總次數重新調整。</p>
+          </div>
+          <div style="margin-bottom:16px;">
+            <p style="font-weight:700;font-size:14px;margin:0 0 6px;">二、訓練請假補償</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin:0;">缺席 1 次團隊訓練，可透過完成 2 次自主訓練補償。需提前告知並在結束後在群組回報。</p>
+          </div>
+          <div>
+            <p style="font-weight:700;font-size:14px;margin:0 0 6px;">三、大四自主訓練制度</p>
+            <p style="font-size:13.5px;color:var(--ink-soft);margin:0;">大四若未返校參與訓練，學期成績以 80 分為基礎。每完成 2 次自主訓練，總成績加 1 分，最高 95 分。</p>
+          </div>
+        </div>
 
-        <!-- ==================== 合作商家 (Partners) ==================== -->
-        <section id="tab-partners" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
-                    <span class="text-xs font-semibold px-2.5 py-1 bg-swim-100 text-swim-800 dark:bg-swim-900 dark:text-swim-200 rounded-full">Partners</span>
-                    <h2 class="text-2xl font-bold mt-2">特約合作商家</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">憑暨大游泳隊身分證件享有專屬優惠折扣。</p>
-                </div>
+        <p class="section-label">游泳隊規範</p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-start space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-swim-50 dark:bg-slate-700 text-swim-600 dark:text-swim-400 flex items-center justify-center text-xl flex-shrink-0">
-                            <i class="fa-solid fa-store"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-base">專業泳具用品店</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">憑證購買泳衣、蛙鞋等全館商品享 88 折優惠。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <p class="section-label">交接資訊</p>
+        <div class="card">
+          <p style="font-weight:700;font-size:14.5px;margin:0 0 4px;">社員名單</p>
+          <p style="font-size:13px;color:var(--stone);margin:0 0 12px;">游泳隊社員名單，供交接與內部查詢使用。</p>
+          <a class="btn ghost" href="https://docs.google.com/spreadsheets/d/1HvOufvzRkVIXqIWrhOzASGQJyyP4OaeT0eSz8BZ1ZxM/edit?usp=drivesdk" target="_blank" rel="noopener">開啟社員名單</a>
+        </div>
+        <div class="card" style="margin-top:12px;">
+          <p style="font-weight:700;font-size:14.5px;margin:0 0 4px;">課外組</p>
+          <p style="font-size:13px;color:var(--stone);margin:0 0 12px;">許多社團相關資訊及交接文件都能從課外組網站取得。</p>
+          <a class="btn ghost" href="https://act.ncnu.edu.tw" target="_blank" rel="noopener">前往課外組網站</a>
+        </div>
+
+        <footer class="pagefoot"><span>更新頻率：每屆交接時</span><span>維護：現任社長</span></footer>
+      </section>
+
+      <!-- 03 器材管理 -->
+      <section class="page" id="page-equipment">
+        <p class="eyebrow">03 / EQUIPMENT</p>
+        <h2 class="pagetitle" data-i18n="page.equipment.title">器材管理</h2>
+        <p class="lede" data-i18n="page.equipment.lede">建立器材資訊的紀錄與傳承，主要由社長負責維護。</p>
+
+        <div class="card" style="padding:0;overflow-x:auto;">
+          <table>
+            <thead><tr><th>器材名稱</th><th>購買日期</th><th>數量</th><th>金額</th><th>使用狀態</th><th>備註</th></tr></thead>
+            <tbody>
+              <tr><td colspan="6" style="text-align:center;color:var(--stone);padding:26px;">尚未建立資料</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">使用狀態欄位建議統一使用：<span class="status-pill status-ok">正常使用</span> <span class="status-pill status-wait">待維修</span> <span class="status-pill status-none">已汰除</span> 等標準用語，方便未來查詢與盤點。</p>
+
+        <footer class="pagefoot"><span>更新頻率：每次採購或盤點</span><span>維護：社長</span></footer>
+      </section>
+
+      <!-- 04 資金收支明細 -->
+      <section class="page" id="page-finance">
+        <p class="eyebrow">04 / FINANCE</p>
+        <h2 class="pagetitle" data-i18n="page.finance.title">資金收支明細</h2>
+        <p class="lede" data-i18n="page.finance.lede">社團經費收支的完整明細，由社長維護，僅開放幹部查看。</p>
+
+        <div class="card" style="text-align:center;padding:36px 20px;">
+          <p style="font-weight:700;font-size:16px;margin:0 0 14px;">資金收支明細表</p>
+          <a class="btn" href="https://docs.google.com/spreadsheets/d/10hHlLCWJ-AN17-LpmlIBIZzbEoDtXIigGcnKqT8za8s/edit?usp=drivesdk" target="_blank" rel="noopener">開啟收支明細表</a>
+          <p class="note" style="margin-top:14px;">內容存放在 Google 試算表，社長可直接於表內更新，網站不需另外修改。</p>
+        </div>
+
+        <footer class="pagefoot"><span>更新頻率：每筆收支發生時</span><span>維護：社長</span></footer>
+      </section>
+
+      <!-- 05 合作商家 -->
+      <section class="page" id="page-partners">
+        <p class="eyebrow">05 / PARTNERS</p>
+        <h2 class="pagetitle" data-i18n="page.partners.title">合作商家</h2>
+        <p class="lede" data-i18n="page.partners.lede">合作商家資訊，僅開放泳隊成員及幹部查看。</p>
+
+        <div class="card" style="text-align:center;padding:36px 20px;">
+          <p style="font-weight:700;font-size:16px;margin:0 0 14px;">Bukubuku 合作商家</p>
+          <a class="btn" href="https://www.instagram.com/bukubuku.tw?stkn=MnpjZDY3ZmViMzFr&utm_source=qr" target="_blank" rel="noopener">前往商家 Instagram</a>
+          <p class="note" style="margin-top:14px;">瀏覽商家的精選動態，並私訊商家確認有你要的商品後再傳給隊長。</p>
+        </div>
+
+        <footer class="pagefoot"><span>更新頻率：不定期</span><span>維護：副社長</span></footer>
+      </section>
+
+      <!-- 06 Instagram -->
+      <section class="page" id="page-instagram">
+        <p class="eyebrow">06 / SOCIAL</p>
+        <h2 class="pagetitle" data-i18n="page.instagram.title">Instagram</h2>
+        <p class="lede" data-i18n="page.instagram.lede">活動宣傳與對外溝通的主要管道，詳細動態請至 Instagram 查看。</p>
+
+        <div class="card" style="text-align:center;padding:36px 20px;">
+          <p style="font-weight:700;font-size:16px;margin:0 0 14px;">追蹤暨大游泳隊</p>
+          <a class="btn" href="https://www.instagram.com/ncnu_swimming_team?stkn=MWFjYjR6YzR0MDRhZw%3D%3D&utm_source=qr" target="_blank" rel="noopener">追蹤我們的 Instagram</a>
+        </div>
+
+        <footer class="pagefoot"><span>更新頻率：不定期</span><span>維護：副社長</span></footer>
+      </section>
 
     </main>
+  </div>
+</div>
 
-    <!-- 頁尾 -->
-    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-6 mt-12 text-center text-xs text-slate-500">
-        <p>&copy; 2026 NCNU Swim Team. 暨大游泳隊｜隊務資訊系統 All Rights Reserved.</p>
-    </footer>
+<script>
+  const navItems = document.querySelectorAll('.navitem');
+  const homeTiles = document.querySelectorAll('.home-tile');
+  const pages = document.querySelectorAll('.page');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const hbtn = document.getElementById('hbtn');
 
-    <!-- 身分切換 Modal -->
-    <div id="roleModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
-            <h3 class="text-lg font-bold">身分切換與驗證</h3>
-            <p class="text-xs text-slate-500">請選擇你的身分，或輸入幹部驗證碼以解鎖進階管理權限。</p>
-            
-            <div class="space-y-2">
-                <button onclick="setRole('test')" class="w-full text-left px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition font-medium text-sm flex justify-between items-center">
-                    <span>🧪 測試中（權限全開）</span>
-                    <span class="text-xs text-slate-400">免驗證</span>
-                </button>
-                <button onclick="setRole('freshman')" class="w-full text-left px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition font-medium text-sm flex justify-between items-center">
-                    <span>🏊 泳隊新生</span>
-                </button>
-                <button onclick="setRole('member')" class="w-full text-left px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition font-medium text-sm flex justify-between items-center">
-                    <span>👥 一般社員</span>
-                </button>
-            </div>
+  function goTo(target){
+    pages.forEach(p => p.classList.toggle('active', p.id === 'page-' + target));
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.target === target));
+    closeMenu();
+    document.querySelector('.content').scrollTo?.(0,0);
+    window.scrollTo(0,0);
+  }
 
-            <div class="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
-                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">幹部驗證碼解鎖：</label>
-                <div class="flex space-x-2">
-                    <input type="password" id="cadrePinInput" placeholder="請輸入驗證碼 (預設2201)" class="flex-grow px-3 py-2 border rounded-xl text-sm dark:bg-slate-900 dark:border-slate-700">
-                    <button onclick="verifyCadrePin()" class="px-4 py-2 bg-swim-600 text-white font-bold rounded-xl text-sm hover:bg-swim-700 transition">驗證</button>
-                </div>
-            </div>
+  navItems.forEach(btn => btn.addEventListener('click', () => goTo(btn.dataset.target)));
+  document.getElementById('brand-home').addEventListener('click', () => goTo('home'));
+  document.getElementById('tbrand-home').addEventListener('click', () => goTo('home'));
+  homeTiles.forEach(btn => btn.addEventListener('click', () => goTo(btn.dataset.target)));
 
-            <div class="flex justify-end pt-2">
-                <button onclick="closeRoleModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold">關閉</button>
-            </div>
-        </div>
-    </div>
+  function openMenu(){ sidebar.classList.add('open'); overlay.classList.add('show'); }
+  function closeMenu(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+  hbtn.addEventListener('click', () => sidebar.classList.contains('open') ? closeMenu() : openMenu());
+  overlay.addEventListener('click', closeMenu);
 
-    <!-- JavaScript 邏輯 -->
-    <script>
-        // 分頁切換
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === tabId) {
-                    btn.classList.add('bg-swim-700');
-                } else {
-                    btn.classList.remove('bg-swim-700');
-                }
-            });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+  // member filter chips (placeholder-ready, no data yet)
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      // 未來加入成員資料後，於此依 chip.dataset.filter 篩選卡片
+    });
+  });
 
-        // 手機版選單切換
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
-        }
+  // ---------- identity gate ----------
+  const STAFF_CODE = '2201';
+  const roleAccess = {
+    freshman: ['home','freshman','instagram'],
+    member:   ['home','instagram'],
+    staff:    ['home','freshman','org','equipment','finance','partners','instagram'],
+    test:     ['home','freshman','org','equipment','finance','partners','instagram']
+  };
 
-        // 暗色模式切換
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const icon = document.getElementById('darkModeIcon');
-            if(document.documentElement.classList.contains('dark')) {
-                icon.className = "fa-solid fa-sun";
-            } else {
-                icon.className = "fa-solid fa-moon";
-            }
-        }
+  let currentRole = null;
+  let currentLang = 'zh';
+  let currentTheme = 'light';
 
-        // 語系切換 (預留)
-        function toggleLang() {
-            alert("目前語系：繁體中文 (EN/中 切換功能建置中)");
-        }
+  const translations = {
+    'sidebar.tagline':        {zh:'隊務資訊與管理系統', en:'Team Info & Management System'},
+    'nav.home':                {zh:'首頁', en:'Home'},
+    'nav.freshman':             {zh:'新生專區', en:'New Members'},
+    'nav.org':                  {zh:'組織與規範', en:'Governance'},
+    'nav.equipment':            {zh:'器材管理', en:'Equipment'},
+    'nav.finance':              {zh:'資金收支明細', en:'Finance'},
+    'nav.partners':             {zh:'合作商家', en:'Partners'},
+    'nav.instagram':            {zh:'Instagram', en:'Instagram'},
+    'role.note.label':          {zh:'目前身分', en:'Current Role'},
+    'role.switch':              {zh:'重新選擇身分', en:'Switch Identity'},
+    'role.freshman':            {zh:'泳隊新生', en:'New Member'},
+    'role.member':              {zh:'社員', en:'Club Member'},
+    'role.staff':                {zh:'泳隊成員及幹部', en:'Team & Officers'},
+    'role.test':                 {zh:'測試中', en:'Testing'},
+    'gate.q':                   {zh:'請選擇你的身分', en:'Please select your role'},
+    'gate.card.staff.title':     {zh:'泳隊成員及幹部', en:'Team & Officers'},
+    'gate.card.staff.desc':      {zh:'需要驗證碼，查看隊務與管理內容', en:'Requires a passcode — view team & admin content'},
+    'gate.card.member.title':    {zh:'社員', en:'Club Member'},
+    'gate.card.member.desc':     {zh:'查看一般社員可瀏覽的完整內容', en:'View the full content available to members'},
+    'gate.card.freshman.title':  {zh:'泳隊新生', en:'New Member'},
+    'gate.card.freshman.desc':   {zh:'查看新生專區與基本隊務資訊', en:'View onboarding info for new members'},
+    'gate.card.test.title':      {zh:'測試中', en:'Testing'},
+    'gate.card.test.desc':       {zh:'開放檢視全部頁面，供測試使用', en:'Full access to all pages, for testing'},
+    'gate.verify.q':             {zh:'幹部驗證', en:'Verification'},
+    'gate.verify.sub':           {zh:'請輸入幹部驗證碼', en:'Enter the passcode'},
+    'gate.verify.placeholder':   {zh:'驗證碼', en:'Passcode'},
+    'gate.verify.error':         {zh:'驗證碼錯誤，請重新輸入', en:'Incorrect passcode, please try again'},
+    'gate.back':                {zh:'返回', en:'Back'},
+    'gate.submit':               {zh:'確認', en:'Confirm'},
+    'hero.title':                {zh:'把散落在 LINE、IG、學校網站裡的隊務資訊，集中成一套系統。', en:'Bringing team info scattered across LINE, Instagram, and the school site into one system.'},
+    'hero.desc':                 {zh:'這裡是游泳隊共用的資訊入口：訓練時間、組織規範、財務與器材紀錄、成員名單，都放在同一個地方，讓每一屆幹部都能直接接手。', en:'This is the swim team\u2019s shared information hub — training times, governance, finance and equipment records, and member info all live in one place, so every future officer team can pick it up directly.'},
+    'tile.freshman.title':       {zh:'新生專區', en:'New Members'},
+    'tile.freshman.desc':        {zh:'選課方向、課程查詢、學分學程', en:'Course guidance, lookup & credit program'},
+    'tile.org.title':            {zh:'組織與規範', en:'Governance'},
+    'tile.org.desc':             {zh:'幹部分工、隊規、交接資訊', en:'Officer roles, rules & handover info'},
+    'tile.equipment.title':      {zh:'器材管理', en:'Equipment'},
+    'tile.equipment.desc':       {zh:'採購紀錄與使用狀態', en:'Purchase records & status'},
+    'tile.finance.title':        {zh:'資金收支明細', en:'Finance'},
+    'tile.finance.desc':         {zh:'社團經費收支明細表', en:'Club income & expense ledger'},
+    'tile.partners.title':       {zh:'合作商家', en:'Partners'},
+    'tile.partners.desc':        {zh:'合作商家資訊與訂購方式', en:'Partner shops & ordering info'},
+    'tile.instagram.title':      {zh:'Instagram', en:'Instagram'},
+    'tile.instagram.desc':       {zh:'追蹤活動與宣傳動態', en:'Follow event updates'},
+    'page.freshman.title':       {zh:'新生專區', en:'New Members'},
+    'page.freshman.lede':        {zh:'給剛加入游泳隊的新生，快速了解學校與隊務相關的重要資訊。', en:'A quick orientation to school and team info for members who just joined.'},
+    'page.org.title':            {zh:'組織與規範', en:'Governance'},
+    'page.org.lede':             {zh:'遇到事情應該找誰？組織是怎麼運作的？這個頁面用來回答這兩個問題。', en:'Who do you go to, and how is the team run? This page answers both.'},
+    'page.equipment.title':      {zh:'器材管理', en:'Equipment'},
+    'page.equipment.lede':       {zh:'建立器材資訊的紀錄與傳承，主要由社長負責維護。', en:'Equipment records kept for continuity, maintained mainly by the president.'},
+    'page.finance.title':        {zh:'資金收支明細', en:'Finance'},
+    'page.finance.lede':         {zh:'社團經費收支的完整明細，由社長維護，僅開放幹部查看。', en:'The full income & expense ledger, maintained by the president, staff-only.'},
+    'page.partners.title':       {zh:'合作商家', en:'Partners'},
+    'page.partners.lede':        {zh:'合作商家資訊，僅開放泳隊成員及幹部查看。', en:'Partner shop info, visible to team members & officers only.'},
+    'page.instagram.title':      {zh:'Instagram', en:'Instagram'},
+    'page.instagram.lede':       {zh:'活動宣傳與對外溝通的主要管道，詳細動態請至 Instagram 查看。', en:'The main channel for event promotion — see Instagram for the latest.'},
+    'cal.title':                 {zh:'賽事行事曆', en:'Competition Calendar'},
+    'cal.upcoming':               {zh:'近期賽事', en:'Upcoming Competitions'},
+    'cal.noSelection':            {zh:'點擊日曆上有標記的日期，查看賽事資訊。', en:'Click a marked date on the calendar to view competition details.'},
+    'cal.location':               {zh:'地點', en:'Location'},
+    'cal.organizer':              {zh:'主辦單位', en:'Organizer'},
+    'cal.regDeadline':            {zh:'報名截止', en:'Registration deadline'}
+  };
 
-        // 身分控制
-        let currentRole = 'test'; // 預設測試中
-        function openRoleModal() {
-            document.getElementById('roleModal').classList.remove('hidden');
-        }
-        function closeRoleModal() {
-            document.getElementById('roleModal').classList.add('hidden');
-        }
-        function setRole(role) {
-            currentRole = role;
-            const badge = document.getElementById('currentRoleBadge');
-            const addEquipBtn = document.getElementById('addEquipBtn');
-            const addFinanceBtn = document.getElementById('addFinanceBtn');
+  function applyLang(lang){
+    currentLang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const entry = translations[el.dataset.i18n];
+      if(entry) el.textContent = entry[lang];
+    });
+    gateCode.placeholder = translations['gate.verify.placeholder'][lang];
+    document.querySelectorAll('[data-lang]').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+    if(currentRole) roleBadge.textContent = translations['role.' + currentRole][lang];
+    if(typeof renderCalendarAll === 'function') renderCalendarAll();
+  }
 
-            if(role === 'test') {
-                badge.innerText = "測試中（權限全開）";
-                addEquipBtn.classList.remove('hidden');
-                addFinanceBtn.classList.remove('hidden');
-            } else if(role === 'cadre') {
-                badge.innerText = "泳隊成員及幹部";
-                addEquipBtn.classList.remove('hidden');
-                addFinanceBtn.classList.remove('hidden');
-            } else if(role === 'freshman') {
-                badge.innerText = "泳隊新生";
-                addEquipBtn.classList.add('hidden');
-                addFinanceBtn.classList.add('hidden');
-            } else {
-                badge.innerText = "社員";
-                addEquipBtn.classList.add('hidden');
-                addFinanceBtn.classList.add('hidden');
-            }
-            closeRoleModal();
-        }
+  function applyTheme(theme){
+    currentTheme = theme;
+    document.body.classList.toggle('theme-dark', theme === 'dark');
+    document.querySelectorAll('[data-theme]').forEach(btn => btn.classList.toggle('active', btn.dataset.theme === theme));
+  }
 
-        function verifyCadrePin() {
-            const pin = document.getElementById('cadrePinInput').value;
-            if(pin === '2201') {
-                setRole('cadre');
-                alert("幹部身分驗證成功！");
-            } else {
-                alert("驗證碼錯誤！");
-            }
-        }
+  document.querySelectorAll('[data-lang]').forEach(btn => btn.addEventListener('click', () => applyLang(btn.dataset.lang)));
+  document.querySelectorAll('[data-theme]').forEach(btn => btn.addEventListener('click', () => applyTheme(btn.dataset.theme)));
 
-        // 初始化 FullCalendar 賽事行事曆
-        document.addEventListener('DOMContentLoaded', function() {
-            const calendarEl = document.getElementById('mini-calendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                initialDate: '2026-11-01', // 預設顯示 2026 年 11 月
-                headerToolbar: {
-                    left: 'prev,next',
-                    center: 'title',
-                    right: 'today'
-                },
-                height: 320,
-                events: [
-                    {
-                        title: '中華泳協排名賽',
-                        start: '2026-11-14',
-                        end: '2026-11-16',
-                        color: '#3b82f6' // 藍色
-                    },
-                    {
-                        title: '全國冬季短水道錦標賽',
-                        start: '2026-11-19',
-                        end: '2026-11-24',
-                        color: '#a855f7' // 紫色
-                    }
-                ]
-            });
-            calendar.render();
-        });
-    </script>
+  const gate = document.getElementById('gate');
+  const gateSelect = document.getElementById('gate-select');
+  const gateVerify = document.getElementById('gate-verify');
+  const gateCode = document.getElementById('gate-code');
+  const gateError = document.getElementById('gate-error');
+  const roleBadge = document.getElementById('role-badge');
+
+  function showGateStep(step){
+    gateSelect.classList.toggle('active', step === 'select');
+    gateVerify.classList.toggle('active', step === 'verify');
+    gateError.style.display = 'none';
+    gateCode.value = '';
+  }
+
+  function applyRoleVisibility(role){
+    const allowed = roleAccess[role];
+    navItems.forEach(btn => { btn.style.display = allowed.includes(btn.dataset.target) ? '' : 'none'; });
+    homeTiles.forEach(btn => { btn.style.display = allowed.includes(btn.dataset.target) ? '' : 'none'; });
+    roleBadge.textContent = translations['role.' + role][currentLang];
+  }
+
+  function enterSite(role){
+    currentRole = role;
+    applyRoleVisibility(role);
+    gate.classList.add('hidden');
+    goTo('home');
+  }
+
+  document.querySelectorAll('.gate-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const role = card.dataset.role;
+      if(role === 'staff'){
+        showGateStep('verify');
+      } else {
+        enterSite(role);
+      }
+    });
+  });
+
+  document.getElementById('gate-back').addEventListener('click', () => showGateStep('select'));
+
+  function submitCode(){
+    if(gateCode.value.trim() === STAFF_CODE){
+      enterSite('staff');
+    } else {
+      gateError.style.display = 'block';
+      gateCode.value = '';
+      gateCode.focus();
+    }
+  }
+  document.getElementById('gate-submit').addEventListener('click', submitCode);
+  gateCode.addEventListener('keydown', e => { if(e.key === 'Enter') submitCode(); });
+
+  document.getElementById('role-switch').addEventListener('click', () => {
+    closeMenu();
+    showGateStep('select');
+    gate.classList.remove('hidden');
+  });
+
+  // ---------- race calendar ----------
+  // 未來新增賽事：直接在下方陣列新增一個物件即可，格式比照既有項目。
+  // regStart / regDeadline / organizer 若無資料可省略或設為 null。
+  // color：用來區分不同賽事的顏色代號，對應的實際顏色統一在 CSS 的
+  // .cal-evt-<color> 規則裡設定（搜尋「不同賽事使用不同顏色」），
+  // 不要在這裡或 HTML 裡直接寫死色碼。目前可用：'blue'、'orange'。
+  const raceEvents = [
+    {
+      id: 'evt-2026-rank',
+      color: 'blue',
+      startDate: '2026-11-14',
+      endDate: '2026-11-15',
+      name: '115年中華泳協排名賽',
+      location: '臺北市立大學詩欣館',
+      organizer: '本會',
+      regStart: null,
+      regDeadline: null
+    },
+    {
+      id: 'evt-2026-shortcourse',
+      color: 'orange',
+      startDate: '2026-11-19',
+      endDate: '2026-11-23',
+      name: '115年全國冬季短水道游泳錦標賽',
+      location: '高雄市立國際游泳池',
+      organizer: null,
+      regStart: '2026-10-16',
+      regDeadline: '2026-11-04'
+    }
+  ];
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  function calDateRange(startStr, endStr){
+    const out = [];
+    let d = new Date(startStr + 'T00:00:00');
+    const end = new Date(endStr + 'T00:00:00');
+    while(d <= end){
+      out.push(`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`);
+      d.setDate(d.getDate() + 1);
+    }
+    return out;
+  }
+
+  const calEventsByDate = {};
+  raceEvents.forEach(ev => {
+    calDateRange(ev.startDate, ev.endDate).forEach(dateStr => {
+      if(!calEventsByDate[dateStr]) calEventsByDate[dateStr] = [];
+      calEventsByDate[dateStr].push(ev);
+    });
+  });
+
+  function calFormatSingle(dateStr){
+    const d = new Date(dateStr + 'T00:00:00');
+    return `${d.getMonth()+1}/${d.getDate()}`;
+  }
+
+  function calFormatRange(ev){
+    const s = new Date(ev.startDate + 'T00:00:00');
+    const e = new Date(ev.endDate + 'T00:00:00');
+    const sStr = `${s.getMonth()+1}/${s.getDate()}`;
+    if(ev.startDate === ev.endDate) return sStr;
+    const eStr = (s.getMonth() === e.getMonth()) ? `${e.getDate()}` : `${e.getMonth()+1}/${e.getDate()}`;
+    return `${sStr}\u2013${eStr}`;
+  }
+
+  let calSelectedDate = null;
+
+  const calListEl = document.getElementById('cal-list');
+
+  // 判斷某個日期是否落在賽事的起訖區間內（含多天賽事），用來決定清單項目是否要反白
+  function calEventIncludesDate(ev, dateStr){
+    if(!dateStr) return false;
+    return dateStr >= ev.startDate && dateStr <= (ev.endDate || ev.startDate);
+  }
+
+  function renderCalList(){
+    const sorted = [...raceEvents].sort((a,b) => a.startDate.localeCompare(b.startDate));
+    calListEl.innerHTML = sorted.map(ev => {
+      const isActive = calEventIncludesDate(ev, calSelectedDate);
+      return `
+      <button type="button" class="cal-list-item${ev.color ? ` cal-evt-${ev.color}` : ''}${isActive ? ' active' : ''}" data-date="${ev.startDate}">
+        <span class="li-date">${calFormatRange(ev)}</span>
+        <span class="li-body">
+          <span class="li-name">${ev.name}</span>
+          <span class="li-loc">${ev.location}</span>
+          ${ev.regDeadline ? `<span class="li-deadline">${translations['cal.regDeadline'][currentLang]}：${calFormatSingle(ev.regDeadline)}</span>` : ''}
+          ${ev.organizer ? `<span class="li-org">${translations['cal.organizer'][currentLang]}：${ev.organizer}</span>` : ''}
+        </span>
+      </button>
+    `;
+    }).join('');
+    calListEl.querySelectorAll('.cal-list-item').forEach(btn => {
+      btn.addEventListener('click', () => calSelectDate(btn.dataset.date));
+    });
+  }
+
+  function calSelectDate(dateStr){
+    calSelectedDate = dateStr;
+    renderCalList();
+  }
+
+  function renderCalendarAll(){
+    renderCalList();
+  }
+
+  renderCalendarAll();
+</script>
+
 </body>
 </html>
+
+</body></html>
